@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pokecard_dex/pokemon_cards/domain/entities/pokemon_card.dart';
 
 class CardListItem extends StatelessWidget {
@@ -51,7 +52,7 @@ class CardListItem extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
-          // Aquí irá la navegación al detalle (Desafío 1)
+          context.go('/card/${card.id}');
         },
         child: Padding(
           padding: const EdgeInsets.all(12),

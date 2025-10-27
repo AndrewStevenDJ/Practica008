@@ -6,4 +6,6 @@ abstract class PokemonCardRepository {
     int pageSize = 20,
     String? searchQuery,
   });
+
+  Future<PokemonCard> getCardById(String id);
 }

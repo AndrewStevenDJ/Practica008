@@ -50,4 +50,22 @@ class PokemonCardRepositoryImpl implements PokemonCardRepository {
       throw Exception('Failed to load Pokémon cards: ${e.message}');
     }
   }
+
+  @override
+  Future<PokemonCard> getCardById(String id) async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        '$_baseUrl/cards/$id',
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final cardData = response.data!['data'] as Map<String, dynamic>;
+        return PokemonCardModel.fromJson(cardData).toEntity();
+      } else {
+        throw Exception('Failed to load Pokémon card detail');
+      }
+    } on DioException catch (e) {
+      throw Exception('Failed to load Pokémon card detail: ${e.message}');
+    }
+  }
 }
