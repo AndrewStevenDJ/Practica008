@@ -7,6 +7,9 @@ class PokemonCard extends Equatable {
     required this.imageUrl,
     this.hp,
     this.supertype,
+    this.types,
+    this.rarity,
+    this.set,
   });
 
   final String id;
@@ -14,7 +17,19 @@ class PokemonCard extends Equatable {
   final String imageUrl;
   final String? hp;
   final String? supertype;
+  final List<String>? types;
+  final String? rarity;
+  final String? set;
 
   @override
-  List<Object?> get props => [id, name, imageUrl, hp, supertype];
+  List<Object?> get props => [
+        id,
+        name,
+        imageUrl,
+        hp,
+        supertype,
+        types,
+        rarity,
+        set,
+      ];
 }

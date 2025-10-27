@@ -7,6 +7,9 @@ class PokemonCardModel {
     required this.images,
     this.hp,
     this.supertype,
+    this.types,
+    this.rarity,
+    this.set,
   });
 
   factory PokemonCardModel.fromJson(Map<String, dynamic> json) {
@@ -16,6 +19,11 @@ class PokemonCardModel {
       images: CardImagesModel.fromJson(json['images'] as Map<String, dynamic>),
       hp: json['hp'] as String?,
       supertype: json['supertype'] as String?,
+      types: json['types'] != null
+          ? (json['types'] as List).map((e) => e as String).toList()
+          : null,
+      rarity: json['rarity'] as String?,
+      set: json['set'] != null ? json['set']['name'] as String? : null,
     );
   }
 
@@ -24,6 +32,9 @@ class PokemonCardModel {
   final CardImagesModel images;
   final String? hp;
   final String? supertype;
+  final List<String>? types;
+  final String? rarity;
+  final String? set;
 
   PokemonCard toEntity() {
     return PokemonCard(
@@ -32,6 +43,9 @@ class PokemonCardModel {
       imageUrl: images.large,
       hp: hp,
       supertype: supertype,
+      types: types,
+      rarity: rarity,
+      set: set,
     );
   }
 }
