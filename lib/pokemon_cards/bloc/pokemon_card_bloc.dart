@@ -24,10 +24,35 @@ class PokemonCardBloc extends Bloc<PokemonCardEvent, PokemonCardState> {
       _onCardsFetched,
       transformer: throttleDroppable(_throttleDuration),
     );
+    on<CardsRefreshed>(_onCardsRefreshed);
   }
 
   final PokemonCardRepository _pokemonCardRepository;
   int _currentPage = 1;
+
+  Future<void> _onCardsRefreshed(
+    CardsRefreshed event,
+    Emitter<PokemonCardState> emit,
+  ) async {
+    // Resetear el estado a inicial
+    _currentPage = 1;
+    emit(const PokemonCardState());
+    
+    // Obtener la primera página de nuevo
+    try {
+      final cards = await _pokemonCardRepository.getCards(page: _currentPage);
+      _currentPage++;
+      emit(
+        state.copyWith(
+          status: PokemonCardStatus.success,
+          cards: cards,
+          hasReachedMax: false,
+        ),
+      );
+    } catch (_) {
+      emit(state.copyWith(status: PokemonCardStatus.failure));
+    }
+  }
 
   Future<void> _onCardsFetched(
     CardsFetched event,
