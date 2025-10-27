@@ -25,22 +25,60 @@ class PokemonCardBloc extends Bloc<PokemonCardEvent, PokemonCardState> {
       transformer: throttleDroppable(_throttleDuration),
     );
     on<CardsRefreshed>(_onCardsRefreshed);
+    on<CardsSearched>(_onCardsSearched);
   }
 
   final PokemonCardRepository _pokemonCardRepository;
   int _currentPage = 1;
 
+  Future<void> _onCardsSearched(
+    CardsSearched event,
+    Emitter<PokemonCardState> emit,
+  ) async {
+    // Resetear estado y comenzar búsqueda
+    _currentPage = 1;
+    emit(
+      state.copyWith(
+        status: PokemonCardStatus.initial,
+        cards: [],
+        hasReachedMax: false,
+        searchQuery: event.query,
+      ),
+    );
+
+    try {
+      final cards = await _pokemonCardRepository.getCards(
+        page: _currentPage,
+        searchQuery: event.query.isNotEmpty ? event.query : null,
+      );
+      _currentPage++;
+      emit(
+        state.copyWith(
+          status: PokemonCardStatus.success,
+          cards: cards,
+          hasReachedMax: false,
+        ),
+      );
+    } catch (_) {
+      emit(state.copyWith(status: PokemonCardStatus.failure));
+    }
+  }
+
   Future<void> _onCardsRefreshed(
     CardsRefreshed event,
     Emitter<PokemonCardState> emit,
   ) async {
-    // Resetear el estado a inicial
+    // Resetear el estado a inicial pero mantener el searchQuery
+    final currentQuery = state.searchQuery;
     _currentPage = 1;
-    emit(const PokemonCardState());
+    emit(PokemonCardState(searchQuery: currentQuery));
     
-    // Obtener la primera página de nuevo
+    // Obtener la primera página de nuevo con el query actual
     try {
-      final cards = await _pokemonCardRepository.getCards(page: _currentPage);
+      final cards = await _pokemonCardRepository.getCards(
+        page: _currentPage,
+        searchQuery: currentQuery.isNotEmpty ? currentQuery : null,
+      );
       _currentPage++;
       emit(
         state.copyWith(
@@ -61,7 +99,11 @@ class PokemonCardBloc extends Bloc<PokemonCardEvent, PokemonCardState> {
     if (state.hasReachedMax) return;
     try {
       if (state.status == PokemonCardStatus.initial) {
-        final cards = await _pokemonCardRepository.getCards(page: _currentPage);
+        final cards = await _pokemonCardRepository.getCards(
+          page: _currentPage,
+          searchQuery:
+              state.searchQuery.isNotEmpty ? state.searchQuery : null,
+        );
         _currentPage++;
         return emit(
           state.copyWith(
@@ -72,7 +114,10 @@ class PokemonCardBloc extends Bloc<PokemonCardEvent, PokemonCardState> {
         );
       }
 
-      final cards = await _pokemonCardRepository.getCards(page: _currentPage);
+      final cards = await _pokemonCardRepository.getCards(
+        page: _currentPage,
+        searchQuery: state.searchQuery.isNotEmpty ? state.searchQuery : null,
+      );
       _currentPage++;
       if (cards.isEmpty) {
         emit(state.copyWith(hasReachedMax: true));

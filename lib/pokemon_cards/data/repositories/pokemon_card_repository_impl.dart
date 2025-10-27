@@ -13,15 +13,23 @@ class PokemonCardRepositoryImpl implements PokemonCardRepository {
   Future<List<PokemonCard>> getCards({
     required int page,
     int pageSize = 20,
+    String? searchQuery,
   }) async {
     try {
+      final queryParameters = <String, dynamic>{
+        'page': page,
+        'pageSize': pageSize,
+        'orderBy': 'name',
+      };
+
+      // Agregar query de búsqueda si existe
+      if (searchQuery != null && searchQuery.isNotEmpty) {
+        queryParameters['q'] = 'name:$searchQuery*';
+      }
+
       final response = await _dio.get<Map<String, dynamic>>(
         '$_baseUrl/cards',
-        queryParameters: {
-          'page': page,
-          'pageSize': pageSize,
-          'orderBy': 'name',
-        },
+        queryParameters: queryParameters,
       );
 
       if (response.statusCode == 200 && response.data != null) {

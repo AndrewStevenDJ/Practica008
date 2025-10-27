@@ -13,6 +13,7 @@ class CardsView extends StatefulWidget {
 
 class _CardsViewState extends State<CardsView> {
   final _scrollController = ScrollController();
+  final _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -23,7 +24,42 @@ class _CardsViewState extends State<CardsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('PokéCard Dex')),
+      appBar: AppBar(
+        title: const Text('PokéCard Dex'),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Buscar por nombre...',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    _searchController.clear();
+                    context.read<PokemonCardBloc>().add(
+                          const CardsSearched(''),
+                        );
+                  },
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              onSubmitted: (query) {
+                context.read<PokemonCardBloc>().add(
+                      CardsSearched(query.trim()),
+                    );
+              },
+            ),
+          ),
+        ),
+      ),
       body: BlocBuilder<PokemonCardBloc, PokemonCardState>(
         builder: (context, state) {
           switch (state.status) {
@@ -87,6 +123,7 @@ class _CardsViewState extends State<CardsView> {
     _scrollController
       ..removeListener(_onScroll)
       ..dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
