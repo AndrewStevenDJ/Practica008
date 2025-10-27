@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pokecard_dex/pokemon_cards/detail/bloc/pokemon_card_detail_bloc.dart';
 import 'package:pokecard_dex/pokemon_cards/domain/entities/pokemon_card.dart';
 
@@ -22,7 +23,7 @@ class CardDetailView extends StatelessWidget {
                     const Text('Error al cargar el detalle'),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () => context.go('/'),
                       child: const Text('Volver'),
                     ),
                   ],
@@ -153,7 +154,7 @@ class _DetailContent extends StatelessWidget {
                 const SizedBox(height: 24),
                 Center(
                   child: ElevatedButton.icon(
-                    onPressed: () => Navigator.of(context).pop(),
+                    onPressed: () => context.go('/'),
                     icon: const Icon(Icons.arrow_back),
                     label: const Text('Volver a la lista'),
                     style: ElevatedButton.styleFrom(
