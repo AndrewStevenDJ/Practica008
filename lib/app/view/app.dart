@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pokecard_dex/counter/counter.dart';
 import 'package:pokecard_dex/l10n/l10n.dart';
+import 'package:pokecard_dex/pokemon_cards/view/cards_page.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -9,14 +9,14 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF13B9FF)),
+        colorScheme: ColorScheme.fromSwatch(
+          accentColor: const Color(0xFF13B9FF),
         ),
-        useMaterial3: true,
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: const CounterPage(),
+      home: const CardsPage(),
     );
   }
 }
