@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pokecard_dex/pokemon_cards/bloc/pokemon_card_bloc.dart';
 import 'package:pokecard_dex/pokemon_cards/widgets/bottom_loader.dart';
 import 'package:pokecard_dex/pokemon_cards/widgets/card_list_item.dart';
+import 'package:pokecard_dex/pokemon_cards/widgets/type_filter_drawer.dart';
 
 class CardsView extends StatefulWidget {
   const CardsView({super.key});
@@ -26,6 +27,49 @@ class _CardsViewState extends State<CardsView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('PokéCard Dex'),
+        actions: [
+          BlocBuilder<PokemonCardBloc, PokemonCardState>(
+            builder: (context, state) {
+              final hasFilters = state.activeFilters.isNotEmpty;
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.filter_list),
+                    onPressed: () {
+                      Scaffold.of(context).openEndDrawer();
+                    },
+                    tooltip: 'Filtrar por tipo',
+                  ),
+                  if (hasFilters)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          '${state.activeFilters.length}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: Padding(
@@ -115,6 +159,7 @@ class _CardsViewState extends State<CardsView> {
           }
         },
       ),
+      endDrawer: const TypeFilterDrawer(),
     );
   }
 

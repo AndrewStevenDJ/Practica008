@@ -19,3 +19,12 @@ final class CardsSearched extends PokemonCardEvent {
   @override
   List<Object> get props => [query];
 }
+
+final class TypeFilterChanged extends PokemonCardEvent {
+  const TypeFilterChanged(this.types);
+  
+  final Set<String> types;
+  
+  @override
+  List<Object> get props => [types];
+}

@@ -26,6 +26,7 @@ class PokemonCardBloc extends Bloc<PokemonCardEvent, PokemonCardState> {
     );
     on<CardsRefreshed>(_onCardsRefreshed);
     on<CardsSearched>(_onCardsSearched);
+    on<TypeFilterChanged>(_onTypeFilterChanged);
   }
 
   final PokemonCardRepository _pokemonCardRepository;
@@ -50,6 +51,41 @@ class PokemonCardBloc extends Bloc<PokemonCardEvent, PokemonCardState> {
       final cards = await _pokemonCardRepository.getCards(
         page: _currentPage,
         searchQuery: event.query.isNotEmpty ? event.query : null,
+        typeFilters: state.activeFilters.isNotEmpty ? state.activeFilters : null,
+      );
+      _currentPage++;
+      emit(
+        state.copyWith(
+          status: PokemonCardStatus.success,
+          cards: cards,
+          hasReachedMax: false,
+        ),
+      );
+    } catch (_) {
+      emit(state.copyWith(status: PokemonCardStatus.failure));
+    }
+  }
+
+  Future<void> _onTypeFilterChanged(
+    TypeFilterChanged event,
+    Emitter<PokemonCardState> emit,
+  ) async {
+    // Resetear estado y aplicar filtros
+    _currentPage = 1;
+    emit(
+      state.copyWith(
+        status: PokemonCardStatus.initial,
+        cards: [],
+        hasReachedMax: false,
+        activeFilters: event.types,
+      ),
+    );
+
+    try {
+      final cards = await _pokemonCardRepository.getCards(
+        page: _currentPage,
+        searchQuery: state.searchQuery.isNotEmpty ? state.searchQuery : null,
+        typeFilters: event.types.isNotEmpty ? event.types : null,
       );
       _currentPage++;
       emit(
@@ -68,16 +104,23 @@ class PokemonCardBloc extends Bloc<PokemonCardEvent, PokemonCardState> {
     CardsRefreshed event,
     Emitter<PokemonCardState> emit,
   ) async {
-    // Resetear el estado a inicial pero mantener el searchQuery
+    // Resetear el estado a inicial pero mantener el searchQuery y filtros
     final currentQuery = state.searchQuery;
+    final currentFilters = state.activeFilters;
     _currentPage = 1;
-    emit(PokemonCardState(searchQuery: currentQuery));
+    emit(
+      PokemonCardState(
+        searchQuery: currentQuery,
+        activeFilters: currentFilters,
+      ),
+    );
     
-    // Obtener la primera página de nuevo con el query actual
+    // Obtener la primera página de nuevo con el query y filtros actuales
     try {
       final cards = await _pokemonCardRepository.getCards(
         page: _currentPage,
         searchQuery: currentQuery.isNotEmpty ? currentQuery : null,
+        typeFilters: currentFilters.isNotEmpty ? currentFilters : null,
       );
       _currentPage++;
       emit(
@@ -103,6 +146,8 @@ class PokemonCardBloc extends Bloc<PokemonCardEvent, PokemonCardState> {
           page: _currentPage,
           searchQuery:
               state.searchQuery.isNotEmpty ? state.searchQuery : null,
+          typeFilters:
+              state.activeFilters.isNotEmpty ? state.activeFilters : null,
         );
         _currentPage++;
         return emit(
@@ -117,6 +162,8 @@ class PokemonCardBloc extends Bloc<PokemonCardEvent, PokemonCardState> {
       final cards = await _pokemonCardRepository.getCards(
         page: _currentPage,
         searchQuery: state.searchQuery.isNotEmpty ? state.searchQuery : null,
+        typeFilters:
+            state.activeFilters.isNotEmpty ? state.activeFilters : null,
       );
       _currentPage++;
       if (cards.isEmpty) {

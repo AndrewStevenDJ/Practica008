@@ -8,24 +8,28 @@ final class PokemonCardState extends Equatable {
     this.cards = const <PokemonCard>[],
     this.hasReachedMax = false,
     this.searchQuery = '',
+    this.activeFilters = const <String>{},
   });
 
   final PokemonCardStatus status;
   final List<PokemonCard> cards;
   final bool hasReachedMax;
   final String searchQuery;
+  final Set<String> activeFilters;
 
   PokemonCardState copyWith({
     PokemonCardStatus? status,
     List<PokemonCard>? cards,
     bool? hasReachedMax,
     String? searchQuery,
+    Set<String>? activeFilters,
   }) {
     return PokemonCardState(
       status: status ?? this.status,
       cards: cards ?? this.cards,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
       searchQuery: searchQuery ?? this.searchQuery,
+      activeFilters: activeFilters ?? this.activeFilters,
     );
   }
 
@@ -35,5 +39,6 @@ final class PokemonCardState extends Equatable {
         cards,
         hasReachedMax,
         searchQuery,
+        activeFilters,
       ];
 }

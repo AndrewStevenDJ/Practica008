@@ -14,6 +14,7 @@ class PokemonCardRepositoryImpl implements PokemonCardRepository {
     required int page,
     int pageSize = 20,
     String? searchQuery,
+    Set<String>? typeFilters,
   }) async {
     try {
       final queryParameters = <String, dynamic>{
@@ -22,9 +23,23 @@ class PokemonCardRepositoryImpl implements PokemonCardRepository {
         'orderBy': 'name',
       };
 
+      // Construir query combinando búsqueda y filtros
+      final queryParts = <String>[];
+      
       // Agregar query de búsqueda si existe
       if (searchQuery != null && searchQuery.isNotEmpty) {
-        queryParameters['q'] = 'name:$searchQuery*';
+        queryParts.add('name:$searchQuery*');
+      }
+      
+      // Agregar filtros de tipos si existen
+      if (typeFilters != null && typeFilters.isNotEmpty) {
+        final typesQuery = typeFilters.map((t) => t.toLowerCase()).join(' OR ');
+        queryParts.add('types:($typesQuery)');
+      }
+      
+      // Combinar todas las partes del query
+      if (queryParts.isNotEmpty) {
+        queryParameters['q'] = queryParts.join(' ');
       }
 
       final response = await _dio.get<Map<String, dynamic>>(
