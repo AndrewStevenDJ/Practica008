@@ -1,7 +1,11 @@
+import 'package:hive/hive.dart';
 import 'package:pokecard_dex/pokemon_cards/domain/entities/pokemon_card.dart';
 
+part 'pokemon_card_model.g.dart';
+
+@HiveType(typeId: 0)
 class PokemonCardModel {
-  const PokemonCardModel({
+  PokemonCardModel({
     required this.id,
     required this.name,
     required this.images,
@@ -27,13 +31,34 @@ class PokemonCardModel {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'images': {'small': images.small, 'large': images.large},
+      'hp': hp,
+      'supertype': supertype,
+      'types': types,
+      'rarity': rarity,
+      'set': set,
+    };
+  }
+
+  @HiveField(0)
   final String id;
+  @HiveField(1)
   final String name;
+  @HiveField(2)
   final CardImagesModel images;
+  @HiveField(3)
   final String? hp;
+  @HiveField(4)
   final String? supertype;
+  @HiveField(5)
   final List<String>? types;
+  @HiveField(6)
   final String? rarity;
+  @HiveField(7)
   final String? set;
 
   PokemonCard toEntity() {
@@ -50,8 +75,9 @@ class PokemonCardModel {
   }
 }
 
+@HiveType(typeId: 1)
 class CardImagesModel {
-  const CardImagesModel({required this.small, required this.large});
+  CardImagesModel({required this.small, required this.large});
 
   factory CardImagesModel.fromJson(Map<String, dynamic> json) {
     return CardImagesModel(
@@ -60,6 +86,8 @@ class CardImagesModel {
     );
   }
 
+  @HiveField(0)
   final String small;
+  @HiveField(1)
   final String large;
 }

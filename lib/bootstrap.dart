@@ -3,6 +3,8 @@ import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pokecard_dex/pokemon_cards/data/models/pokemon_card_model.dart';
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
@@ -21,6 +23,27 @@ class AppBlocObserver extends BlocObserver {
 }
 
 Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Inicializar Hive
+  await Hive.initFlutter();
+  
+  // Registrar adaptadores de Hive
+  Hive.registerAdapter(PokemonCardModelAdapter());
+  Hive.registerAdapter(CardImagesModelAdapter());
+  
+  // Abrir la caja de caché
+  final box = await Hive.openBox<List<dynamic>>('pokemon_cards_cache');
+  
+  // Limpiar caché corrupto de la versión anterior
+  try {
+    print('🧹 Cleaning old cache...');
+    await box.clear();
+    print('✅ Cache cleared successfully');
+  } catch (e) {
+    print('⚠️ Error clearing cache: $e');
+  }
+  
   FlutterError.onError = (details) {
     log(details.exceptionAsString(), stackTrace: details.stack);
   };
